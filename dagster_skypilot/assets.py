@@ -10,15 +10,24 @@ from dagster_skypilot.consts import DEPLOYMENT_TYPE
 @asset(group_name="ai")
 def skypilot_model(context: AssetExecutionContext) -> None:
     # Set up the API credentials by reading from the deployment env vars
-    key_file = Path.home() / ".lambda_cloud" / "lambda_keys"
+    lambda_key_file = Path.home() / ".lambda_cloud" / "lambda_keys"
+    aws_key_file = Path.home() / ".aws" / "credentials"
 
     # Don't overwrite local keys, but always populate them dynamically in
     # Dagster Cloud
     if not DEPLOYMENT_TYPE == "local":
-        key_file.touch(exist_ok=True)
+        lambda_key_file.touch(exist_ok=True)
+        aws_key_file.touch(exist_ok=True)
 
-        with key_file.open("w") as f:
+        with lambda_key_file.open("w") as f:
             f.write("api_key = {}".format(os.getenv("LAMBDA_LABS_API_KEY")))
+
+        with aws_key_file.open("w") as f:
+            f.write(
+                "[default]\n"
+                f"aws_access_key_id = {os.getenv('AWS_ACCESS_KEY_ID')}\n"
+                f"aws_secret_access_key = {os.getenv('AWS_SECRET_ACCESS_KEY')}\n"
+            )
 
     # The setup command.
     setup = r"""
