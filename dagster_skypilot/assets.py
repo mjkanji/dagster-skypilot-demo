@@ -17,8 +17,8 @@ def skypilot_model(context: AssetExecutionContext) -> None:
     # Don't overwrite local keys, but always populate them dynamically in
     # Dagster Cloud
     if not DEPLOYMENT_TYPE == "local":
-        lambda_key_file.touch(exist_ok=True)
-        aws_key_file.touch(exist_ok=True)
+        lambda_key_file.parent.mkdir(parents=True, exist_ok=True)
+        aws_key_file.parent.mkdir(parents=True, exist_ok=True)
 
         with lambda_key_file.open("w") as f:
             f.write("api_key = {}".format(os.getenv("LAMBDA_LABS_API_KEY")))
