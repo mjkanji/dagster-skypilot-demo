@@ -3,7 +3,6 @@ from pathlib import Path
 
 import sky
 from dagster import AssetExecutionContext, asset
-from sky.check import check
 
 from dagster_skypilot.consts import DEPLOYMENT_TYPE
 
