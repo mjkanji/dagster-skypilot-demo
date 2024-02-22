@@ -1,1 +1,1 @@
-sudo apt install rsync
+apt install rsync
