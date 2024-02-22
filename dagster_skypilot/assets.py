@@ -1,9 +1,25 @@
-from dagster import AssetExecutionContext, asset
+import os
+from pathlib import Path
+
 import sky
+from dagster import AssetExecutionContext, asset
+
+from dagster_skypilot.consts import DEPLOYMENT_TYPE
 
 
 @asset(group_name="ai")
 def skypilot_model(context: AssetExecutionContext) -> None:
+    # Set up the API credentials by reading from the deployment env vars
+    key_file = Path.home() / ".lambda_cloud" / "lambda_keys"
+
+    # Don't overwrite local keys, but always populate them dynamically in
+    # Dagster Cloud
+    if not DEPLOYMENT_TYPE == "local":
+        key_file.touch(exist_ok=True)
+
+        with key_file.open("w") as f:
+            f.write("api_key = {}".format(os.getenv("LAMBDA_LABS_API_KEY")))
+
     # The setup command.
     setup = r"""
         set -e  # Exit if any command failed.
