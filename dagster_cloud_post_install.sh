@@ -1,2 +1,2 @@
 apt-get update
-apt-get install rsync -y
+apt-get install rsync openssh-client -y
