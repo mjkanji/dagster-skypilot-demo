@@ -1,0 +1,5 @@
+locations:
+  - location_name: SkyPilot
+    code_source:
+      module_name: dagster-skypilot
+
