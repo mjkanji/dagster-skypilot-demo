@@ -3,6 +3,7 @@ from pathlib import Path
 
 import sky
 from dagster import AssetExecutionContext, asset
+from sky.check import check
 
 from dagster_skypilot.consts import DEPLOYMENT_TYPE
 
@@ -28,6 +29,12 @@ def skypilot_model(context: AssetExecutionContext) -> None:
                 f"aws_access_key_id = {os.getenv('AWS_ACCESS_KEY_ID')}\n"
                 f"aws_secret_access_key = {os.getenv('AWS_SECRET_ACCESS_KEY')}\n"
             )
+
+    context.log.info(f"{DEPLOYMENT_TYPE = }")
+    context.log.info(f"{lambda_key_file.exists() = }")
+    context.log.info(f"{aws_key_file.exists() = }")
+
+    check()
 
     # The setup command.
     setup = r"""
@@ -74,6 +81,6 @@ def skypilot_model(context: AssetExecutionContext) -> None:
     ).set_storage_mounts(storage_mounts)
 
     # sky.launch(task, dryrun=True)
-    sky.launch(task, cluster_name="dnn", idle_minutes_to_autostop=5, down=True)  # type: ignore
+    # sky.launch(task, cluster_name="dnn", idle_minutes_to_autostop=5, down=True)  # type: ignore
 
     return None
