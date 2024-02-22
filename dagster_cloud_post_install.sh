@@ -1,2 +1,2 @@
 apt-get update
-apt-get install rsync
+apt-get install rsync -y
