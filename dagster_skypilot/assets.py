@@ -7,9 +7,14 @@ from dagster import AssetExecutionContext, asset
 from dagster_skypilot.consts import DEPLOYMENT_TYPE
 
 
-@asset(group_name="ai")
-def skypilot_model(context: AssetExecutionContext) -> None:
-    # Set up the API credentials by reading from the deployment env vars
+def populate_keyfiles():
+    """
+    SkyPilot only supports reading credentials from key files and not environment
+    variables.
+
+    This reads the credentials for AWS and Lambda Labs from env vars (set in the
+    Dagster Cloud UI) and then populates the expected key files accordingly.
+    """
     lambda_key_file = Path.home() / ".lambda_cloud" / "lambda_keys"
     aws_key_file = Path.home() / ".aws" / "credentials"
 
@@ -28,6 +33,13 @@ def skypilot_model(context: AssetExecutionContext) -> None:
                 f"aws_access_key_id = {os.getenv('AWS_ACCESS_KEY_ID')}\n"
                 f"aws_secret_access_key = {os.getenv('AWS_SECRET_ACCESS_KEY')}\n"
             )
+
+
+@asset(group_name="ai")
+def skypilot_model(context: AssetExecutionContext) -> None:
+    # SkyPilot doesn't support reading credentials from environment variables.
+    # So, we need to populate the required keyfiles.
+    populate_keyfiles()
 
     # The setup command.
     setup = r"""
