@@ -12,7 +12,8 @@ concurrency:
 env:
   DAGSTER_CLOUD_URL: "http://muhammad-dagster.dagster.cloud"
   DAGSTER_CLOUD_API_TOKEN: ${{ secrets.DAGSTER_CLOUD_API_TOKEN }}
-  ENABLE_FAST_DEPLOYS: 'false'
+  SERVERLESS_BASE_IMAGE_TAG: "sha256_10ccf80b24329869dce33c8f06e5f70797a44d24c75fa7e5486978658a4b1152"
+  ENABLE_FAST_DEPLOYS: 'true'
   PYTHON_VERSION: '3.10'
   DAGSTER_CLOUD_FILE: 'dagster_cloud.yaml'
 
