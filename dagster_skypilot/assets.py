@@ -37,6 +37,10 @@ def populate_keyfiles():
 
 @asset(group_name="ai")
 def skypilot_model(context: AssetExecutionContext) -> None:
+    # SkyPilot doesn't support reading credentials from environment variables.
+    # So, we need to populate the required keyfiles.
+    populate_keyfiles()
+
     execute_shell_command(
         "sky launch -c dnn dnn.yaml --yes -i 5 --down",
         output_logging="STREAM",
