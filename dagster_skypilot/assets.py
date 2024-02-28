@@ -46,4 +46,6 @@ def skypilot_model(context: AssetExecutionContext) -> None:
         output_logging="STREAM",
         log=context.log,
         cwd=str(Path(__file__).parent.parent),
+        # Disable color and styling for rich
+        env=os.environ | {"NO_COLOR": "1"},
     )
