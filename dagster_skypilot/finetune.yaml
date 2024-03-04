@@ -4,18 +4,19 @@ resources:
   disk_tier: best
 
 envs:
-  DAGSTER_RUN_ID: "" # The ID of the Dagster run that trggered the job
+  DAGSTER_RUN_ID: "no-run" # The ID of the Dagster run that trggered the job. Overwritten by the Dagster process.
   HF_TOKEN: "" # We'll pass this via the Dagster Cloud UI or a .env file instead
-  BUCKET_NAME: s3://dagster-skypilot-bucket # Change to your own bucket name
+  SKYPILOT_BUCKET: s3://dagster-skypilot-bucket # Change to your own bucket name
+  SCRIPT_WORKING_DIR: ""
   TERM: "dumb"
   NO_COLOR: 1
 
-workdir: ./scripts
-
 file_mounts:
   /artifacts:
-    source: $BUCKET_NAME
+    source: ${SKYPILOT_BUCKET}
     mode: MOUNT
+
+  /scripts: ${SCRIPT_WORKING_DIR}
 
 # The '|' separator indicates a multiline string.
 setup: |
@@ -49,7 +50,7 @@ run: |
     --master_port=12375 \
     --master_addr=$HOST_ADDR \
     --node_rank=${SKYPILOT_NODE_RANK} \
-    lora.py \
+    /scripts/lora.py \
     --model_name_or_path google/gemma-7b \
     --save_steps 4 \
     --output_dir /artifacts/${DAGSTER_RUN_ID}
