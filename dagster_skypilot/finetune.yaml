@@ -7,7 +7,6 @@ envs:
   DAGSTER_RUN_ID: "" # The ID of the Dagster run that trggered the job
   HF_TOKEN: "" # We'll pass this via the Dagster Cloud UI or a .env file instead
   BUCKET_NAME: s3://dagster-skypilot-bucket # Change to your own bucket name
-  WANDB_API_KEY: "" # You can ignore this if you don't use Weights & Biases
   TERM: "dumb"
   NO_COLOR: 1
 
@@ -41,10 +40,8 @@ run: |
   NUM_NODES=`echo "$SKYPILOT_NODE_IPS" | wc -l`
   HOST_ADDR=`echo "$SKYPILOT_NODE_IPS" | head -n1`
 
-  # Turn off wandb if no api key is provided
-  if [ $WANDB_API_KEY == "" ]; then
-    WANDB_MODE="offline"
-  fi
+  # Turn off wandb
+  WANDB_MODE="offline"
 
   TERM=dumb NO_COLOR=1 torchrun \
     --nnodes=$NUM_NODES \
