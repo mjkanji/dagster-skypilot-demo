@@ -4,7 +4,9 @@ resources:
   disk_tier: best
 
 envs:
-  DAGSTER_RUN_ID: "no-run" # The ID of the Dagster run that trggered the job. Overwritten by the Dagster process.
+  # The ID of the Dagster run that trggered the job.
+  # Overwritten by the Dagster process.
+  DAGSTER_RUN_ID: "no-run"
   HF_TOKEN: "" # We'll pass this via the Dagster Cloud UI or a .env file instead
   SKYPILOT_BUCKET: s3://dagster-skypilot-bucket # Change to your own bucket name
   SCRIPT_WORKING_DIR: ""

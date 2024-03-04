@@ -15,6 +15,13 @@ def get_metrics(context: AssetExecutionContext, bucket):
         return json.load(f)
 
 
+def teardown_all_clusters():
+    clusters = sky.status(refresh=True)
+
+    for c in clusters:
+        sky.down(c["name"])
+
+
 @asset(group_name="ai")
 def skypilot_yaml(context: AssetExecutionContext) -> None:
     # SkyPilot doesn't support reading credentials from environment variables.
@@ -84,5 +91,5 @@ def skypilot_python_api(context: AssetExecutionContext) -> None:
         context.add_output_metadata(get_metrics(context, skypilot_bucket))
 
     finally:
-        sky.down("gemma")
+        teardown_all_clusters()
         ...
