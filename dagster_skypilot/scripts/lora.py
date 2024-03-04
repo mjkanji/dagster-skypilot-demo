@@ -153,8 +153,12 @@ def train():
         formatting_func=formatting_func,
     )
     trainer.add_callback(CheckpointCallback)
-    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
+    train_results = trainer.train(resume_from_checkpoint=resume_from_checkpoint)
     safe_save_model_for_hf_trainer(trainer=trainer, output_dir=training_args.output_dir)
+
+    metrics = train_results.metrics
+    trainer.log_metrics("train", metrics)
+    trainer.save_metrics("train", metrics)
 
 
 if __name__ == "__main__":
