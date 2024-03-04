@@ -9,5 +9,18 @@ setup(
         "skypilot[aws,azure,gcp]",
         "dagster-shell",
     ],
-    extras_require={"dev": ["dagster-webserver", "pytest"]},
+    extras_require={
+        "dev": [
+            "dagster-webserver",
+            "pytest",
+            # All of these dependencies are only required by lora.py, which is
+            # never run on the Dagster instance itself. Adding them as dev deps
+            # to avoid linter errors.
+            "datasets",
+            "transformers",
+            "trl",
+            "peft",
+            "torch",
+        ]
+    },
 )
