@@ -6,8 +6,10 @@ setup(
     install_requires=[
         "dagster>=1.6.0,<1.7.0",
         "dagster-cloud",
-        "skypilot[aws,azure,gcp]",
         "dagster-shell",
+        "universal_pathlib",
+        "s3fs",
+        "skypilot[aws,azure,gcp]",
     ],
     extras_require={
         "dev": [
