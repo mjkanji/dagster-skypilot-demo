@@ -19,54 +19,14 @@ def teardown_all_clusters(logger):
     clusters = sky.status(refresh=True)
 
     for c in clusters:
-        logger.info(f"Shutting down {c['name']}.")
+        logger.info(f"Shutting down cluster: {c['name']}.")
         sky.down(c["name"])
 
     logger.info("All clusters shut down.")
 
 
 @asset(group_name="ai")
-def skypilot_yaml(context: AssetExecutionContext) -> None:
-    # SkyPilot doesn't support reading credentials from environment variables.
-    # So, we need to populate the required keyfiles.
-    populate_keyfiles()
-
-    skypilot_bucket = os.getenv("SKYPILOT_BUCKET")
-
-    try:
-        execute_shell_command(
-            "sky launch -c gemma finetune.yaml --env HF_TOKEN --env DAGSTER_RUN_ID --yes",  # -i 5 --down",
-            output_logging="STREAM",
-            log=context.log,
-            cwd=str(UPath(__file__).parent),
-            # Disable color and styling for rich
-            env={
-                **os.environ,
-                "TERM": "dumb",
-                "NO_COLOR": "1",
-                "HF_TOKEN": os.getenv("HF_TOKEN", ""),
-                "DAGSTER_RUN_ID": context.run_id,
-            },
-        )
-
-        context.add_output_metadata(get_metrics(context, skypilot_bucket))
-    finally:
-        execute_shell_command(
-            "sky down --all --yes",  # -i 5 --down",
-            output_logging="STREAM",
-            log=context.log,
-            cwd=str(UPath(__file__).parent),
-            # Disable color and styling for rich
-            env={
-                **os.environ,
-                "TERM": "dumb",
-                "NO_COLOR": "1",
-            },
-        )
-
-
-@asset(group_name="ai")
-def skypilot_python_api(context: AssetExecutionContext) -> None:
+def skypilot_model(context: AssetExecutionContext) -> None:
     # SkyPilot doesn't support reading credentials from environment variables.
     # So, we need to populate the required keyfiles.
     populate_keyfiles()
