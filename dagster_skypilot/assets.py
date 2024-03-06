@@ -81,10 +81,10 @@ def skypilot_python_api(context: AssetExecutionContext) -> None:
         env_overrides={  # type: ignore
             "HF_TOKEN": os.getenv("HF_TOKEN", ""),
             "DAGSTER_RUN_ID": context.run_id,
-            "SCRIPT_WORKING_DIR": str(parent_dir / "scripts"),
             "BUCKET_NAME": skypilot_bucket,
         },
     )
+    task.workdir = str(parent_dir.absolute() / "scripts")
 
     try:
         sky.launch(task, cluster_name="gemma", idle_minutes_to_autostop=5)  # type: ignore
