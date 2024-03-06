@@ -9,6 +9,7 @@ envs:
   DAGSTER_RUN_ID: "no-run"
   HF_TOKEN: "" # We'll pass this via the Dagster Cloud UI or a .env file instead
   SKYPILOT_BUCKET: s3://dagster-skypilot-bucket # Change to your own bucket name
+  MAX_STEPS: 10
   TERM: "dumb"
   NO_COLOR: 1
 
@@ -54,4 +55,5 @@ run: |
     lora.py \
     --model_name_or_path google/gemma-7b \
     --save_steps 4 \
+    --max_steps ${MAX_STEPS} \
     --output_dir /artifacts/${DAGSTER_RUN_ID}
