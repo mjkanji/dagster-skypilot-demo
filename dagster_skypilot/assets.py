@@ -15,11 +15,14 @@ def get_metrics(context: AssetExecutionContext, bucket):
         return json.load(f)
 
 
-def teardown_all_clusters():
+def teardown_all_clusters(logger):
     clusters = sky.status(refresh=True)
 
     for c in clusters:
+        logger.info(f"Shutting down {c['name']}.")
         sky.down(c["name"])
+
+    logger.info("All clusters shut down.")
 
 
 @asset(group_name="ai")
@@ -91,5 +94,5 @@ def skypilot_python_api(context: AssetExecutionContext) -> None:
         context.add_output_metadata(get_metrics(context, skypilot_bucket))
 
     finally:
-        teardown_all_clusters()
+        teardown_all_clusters(context.log)
         ...
