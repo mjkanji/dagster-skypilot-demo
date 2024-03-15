@@ -64,12 +64,12 @@ def skypilot_model(context: AssetExecutionContext, config: SkyPilotConfig) -> No
 
     try:
         if config.spot_launch:
-            context.log.info("Launching task. See stdout for SkyPilot logs.")
-            sky.spot_launch(task, "gemma")  # type: ignore
-        else:
             context.log.info(
                 "Launching managed spot job. See stdout for SkyPilot logs."
             )
+            sky.spot_launch(task, "gemma")  # type: ignore
+        else:
+            context.log.info("Launching task. See stdout for SkyPilot logs.")
             sky.launch(task, "gemma")  # type: ignore
 
         context.log.info("Task completed.")
