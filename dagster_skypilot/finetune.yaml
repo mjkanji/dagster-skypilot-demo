@@ -1,6 +1,8 @@
 resources:
   cloud: aws
+  # region: us-east-1
   accelerators: {L4, A10g, A10, L40, A40, A100, A100-80GB}
+  cpus: 4
   disk_tier: best
 
 envs:

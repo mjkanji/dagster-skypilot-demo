@@ -3,8 +3,8 @@ import os
 
 import sky
 import yaml
-from dagster import AssetExecutionContext, asset
-from dagster_shell import execute_shell_command
+from dagster import AssetExecutionContext, Config, asset
+from pydantic import Field
 from upath import UPath
 
 from dagster_skypilot.utils import populate_keyfiles
@@ -25,8 +25,20 @@ def teardown_all_clusters(logger):
     logger.info("All clusters shut down.")
 
 
+class SkyPilotConfig(Config):
+    """A minimal set of configurations for SkyPilot. This is NOT intended as a
+    complete or exhaustive representation of a Task YAML config."""
+
+    max_steps: int = Field(
+        default=10, description="Number of training steps to perform."
+    )
+    spot_launch: bool = Field(
+        default=False, description="Should the task be run as a managed spot job?"
+    )
+
+
 @asset(group_name="ai")
-def skypilot_model(context: AssetExecutionContext) -> None:
+def skypilot_model(context: AssetExecutionContext, config: SkyPilotConfig) -> None:
     # SkyPilot doesn't support reading credentials from environment variables.
     # So, we need to populate the required keyfiles.
     populate_keyfiles()
@@ -45,12 +57,22 @@ def skypilot_model(context: AssetExecutionContext) -> None:
             "HF_TOKEN": os.getenv("HF_TOKEN", ""),
             "DAGSTER_RUN_ID": context.run_id,
             "BUCKET_NAME": skypilot_bucket,
+            "MAX_STEPS": config.max_steps,
         },
     )
     task.workdir = str(parent_dir.absolute() / "scripts")
 
     try:
-        sky.launch(task, cluster_name="gemma", idle_minutes_to_autostop=5)  # type: ignore
+        if config.spot_launch:
+            context.log.info("Launching task. See stdout for SkyPilot logs.")
+            sky.spot_launch(task, name="gemma")
+        else:
+            context.log.info(
+                "Launching managed spot job. See stdout for SkyPilot logs."
+            )
+            sky.launch(task, cluster_name="gemma")  # type: ignore
+
+        context.log.info("Task completed.")
         context.add_output_metadata(get_metrics(context, skypilot_bucket))
 
     finally:
