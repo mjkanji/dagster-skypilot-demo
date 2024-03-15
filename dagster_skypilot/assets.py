@@ -56,7 +56,7 @@ def skypilot_model(context: AssetExecutionContext, config: SkyPilotConfig) -> No
         env_overrides={  # type: ignore
             "HF_TOKEN": os.getenv("HF_TOKEN", ""),
             "DAGSTER_RUN_ID": context.run_id,
-            "BUCKET_NAME": skypilot_bucket,
+            "SKYPILOT_BUCKET": skypilot_bucket,
             "MAX_STEPS": config.max_steps,
         },
     )
@@ -65,12 +65,12 @@ def skypilot_model(context: AssetExecutionContext, config: SkyPilotConfig) -> No
     try:
         if config.spot_launch:
             context.log.info("Launching task. See stdout for SkyPilot logs.")
-            sky.spot_launch(task, name="gemma")
+            sky.spot_launch(task, "gemma")  # type: ignore
         else:
             context.log.info(
                 "Launching managed spot job. See stdout for SkyPilot logs."
             )
-            sky.launch(task, cluster_name="gemma")  # type: ignore
+            sky.launch(task, "gemma")  # type: ignore
 
         context.log.info("Task completed.")
         context.add_output_metadata(get_metrics(context, skypilot_bucket))
